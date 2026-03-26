@@ -21,7 +21,7 @@ class dbHandler:
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             server_id INTEGER,
             player_count INTEGER,
-            date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
         """)
         self.conn.commit()
