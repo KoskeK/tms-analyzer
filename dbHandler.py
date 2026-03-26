@@ -30,12 +30,7 @@ class dbHandler:
         self.cursor.execute("INSERT INTO servers (ip, img, tags, version) VALUES (?, ?, ?, ?)", (ip, img, tags, version))
         self.conn.commit()
     
-    def update_server(self, server_id, **kwargs):
-        fields = []
-        values = []
-        for key, value in kwargs.items():
-            fields.append(f"{key} = ?")
-            values.append(value)
+    def update_server(self, server_id, fields, values):
         values.append(server_id)
         self.cursor.execute(f"UPDATE servers SET {', '.join(fields)}, date_updated = CURRENT_TIMESTAMP WHERE id = ?", values)
         self.conn.commit()
