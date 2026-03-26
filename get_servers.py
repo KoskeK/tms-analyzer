@@ -6,7 +6,7 @@ import time
 maxCount = 100
 
 db = dbHandler.dbHandler()
-pbar = tqdm.pbar(total=maxCount, desc="Scanning pages")
+pbar = tqdm(total=maxCount, desc="Scanning pages")
 for i in range(1, maxCount + 1):
     servers = scanner.scan_pages(i)
     for server in servers:
