@@ -7,7 +7,7 @@ pbar = tqdm(total=len(servers), desc="Updating player counts")
 for server in servers:
     pbar.update(1)
     ip = server[1]
-    player_count = scanner.get_player_count(ip)
+    player_count = scanner.check_server(ip)
     if player_count["online"]:
         db.update_player_count(ip, player_count)
     else:
