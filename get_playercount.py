@@ -11,6 +11,6 @@ for server in servers:
     if player_count["online"]:
         db.update_player_count(ip, player_count)
     else:
-        db.update_server(server[0], ["enabled"], [False])
+        db.update_server(server[0], enabled=False)
 db.close()
 print("Done!")
