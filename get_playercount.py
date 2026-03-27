@@ -9,7 +9,7 @@ for server in servers:
     ip = server[1]
     player_count = scanner.check_server(ip)
     if player_count["online"]:
-        db.add_status(server[0], player_count["player_count"])
+        db.add_status(server[0], player_count["players"])
     else:
         db.update_server(server[0], enabled=False)
 db.close()
