@@ -2,7 +2,7 @@ import dbHandler
 import scanner
 from tqdm import tqdm
 db = dbHandler.dbHandler()
-servers = list(db.get_servers("enabled", True))
+servers = db.get_all_servers("enabled", True)
 pbar = tqdm(total=len(servers), desc="Updating player counts")
 for server in servers:
     pbar.update(1)
