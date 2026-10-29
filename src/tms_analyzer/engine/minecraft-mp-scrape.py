@@ -1,6 +1,13 @@
+from sqlalchemy import create_engine, select
+from sqlalchemy.orm import Session
+
+from tms_analyzer.shared.database import DATABASE_URL
+from tms_analyzer.shared.models import Server, Report
+from tms_analyzer.engine.scanner import scan_pages
+from dotenv import load_dotenv
+import os
 import httpx
 from bs4 import BeautifulSoup
-from mcstatus import JavaServer
 
 def scan_pages(num=1):
     response = httpx.get(f"https://minecraft-mp.com/servers/latest/{num}/")
@@ -38,31 +45,32 @@ def scan_pages(num=1):
         version_text = a_version.get_text(strip=True) if a_version else None
 
         # Combine
-        data.append({
-            "ip": ip_text,
-            "tags": tags,
-            "enabled": True,
-            "version": version_text,
-            "url":url
-        })
+        data.append(
+        Server(
+            ip=ip_text,
+            tags=tags,
+            enabled=True,
+            version=version_text,
+            url=url
+        )
+        )
     return data
 
-def check_server(ip):
-    try:
-        server = JavaServer.lookup(ip)
-        status = server.status()
-        return {
-            "ip": ip,
-            "online": True,
-            "players": status.players.online,
-        }
-    except Exception as e:
-        print(f"Error checking server {ip}: {e}")
-        return {
-            "ip": ip,
-            "online": False
-        }
-
 if __name__ == "__main__":
-    print(scan_pages(2))
-    print(scan_pages(10000000))
+    engine = create_engine(DATABASE_URL)
+
+    with Session(engine) as session:
+        pageNum = 1
+        while True:
+            servers = scan_pages(pageNum)
+            if servers == None:
+                break
+            else:
+                for server in servers:
+                    if session.scalars(select(Server).where(Server.ip==server.ip)) != None:
+                        break
+                    else:
+                        session.add(server)
+                        session.commit()
+
+    engine.dispose()
