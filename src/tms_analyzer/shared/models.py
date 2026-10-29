@@ -1,37 +1,23 @@
+from datetime import datetime, timezone
 
-from datetime import datetime
-from zoneinfo import ZoneInfo
+from sqlalchemy import (
+    String, Integer, Boolean, ForeignKey, DateTime
+)
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from extensions import db
+from database import Base
 
 
-HELSINKI = ZoneInfo("Europe/Helsinki")
-
-
-class Server(db.Model):
+class Server(Base):
     __tablename__ = "servers"
 
-    id = db.Column(db.Integer, primary_key=True)
+    id: Mapped[int] = mapped_column(primary_key=True)
+    ip: Mapped[str] = mapped_column(String(80), unique=True)
+    tags: Mapped[str] = mapped_column(String(1200), default="")
+    url: Mapped[str] = mapped_column(String(1200))
+    version: Mapped[str] = mapped_column(String(80))
 
-    ip = db.Column(
-        db.String(80),
-        unique=True,
-        nullable=False,
-    )
-
-    tags = db.Column(
-        db.String(1200),
-        nullable=False,
-        default="",
-    )
-
-    url = db.Column(
-        db.String(1200),
-        nullable=False,
-    )
-
-    reports = db.relationship(
-        "Report",
+    reports: Mapped[list["Report"]] = relationship(
         back_populates="server",
         cascade="all, delete-orphan",
     )
@@ -40,40 +26,26 @@ class Server(db.Model):
         return f"<Server {self.ip}>"
 
 
-class Report(db.Model):
+class Report(Base):
     __tablename__ = "reports"
 
-    id = db.Column(db.Integer, primary_key=True)
+    id: Mapped[int] = mapped_column(primary_key=True)
+    player_count: Mapped[int] = mapped_column(Integer)
+    online: Mapped[bool] = mapped_column(Boolean, default=False)
 
-    player_count = db.Column(
-        db.Integer,
-        nullable=False,
-        default=0,
-    )
-
-    online = db.Column(
-        db.Boolean,
-        nullable=False,
-        default=False,
-    )
-
-    server_id = db.Column(
-        db.Integer,
-        db.ForeignKey("servers.id"),
-        nullable=False,
+    server_id: Mapped[int] = mapped_column(
+        ForeignKey("servers.id"),
         index=True,
     )
 
-    server = db.relationship(
-        "Server",
-        back_populates="reports",
+    server: Mapped["Server"] = relationship(
+        back_populates="reports"
     )
 
-    time = db.Column(
-        db.DateTime(timezone=True),
-        nullable=False,
-        default=lambda: datetime.now(HELSINKI),
+    time: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        default=lambda: datetime.now(timezone.utc),
     )
 
     def __repr__(self):
-        return f"<Report server_id={self.server_id} time={self.time}>"
+        return f"<Report server_id={self.server_id}>"

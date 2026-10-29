@@ -17,16 +17,14 @@ def scan_pages(num=1):
 
         ip_text = a.get_text(strip=True)
 
-        img = a.find("img")
-        img_src = None
-        if img:
-            img_src = img.get("src") or img.get("data-src")
-
         # Tags
         tags_div = row.select_one("div.list-server-tags-scroll")
         tags = []
         if tags_div:
-            tags = [tag.get_text(strip=True) for tag in tags_div.find_all("a")]
+            tags = [
+                tag.get_text(strip=True)
+                for tag in row.select(".btn-tag")
+            ]
         
         a_version = row.select_one(
         "a.btn.btn-default.btn-xs.btn-block-xs.btn-version-fade.text-left"
@@ -36,7 +34,6 @@ def scan_pages(num=1):
         # Combine
         data.append({
             "ip": ip_text,
-            "img": img_src,
             "tags": tags,
             "enabled": True,
             "version": version_text
@@ -51,8 +48,6 @@ def check_server(ip):
             "ip": ip,
             "online": True,
             "players": status.players.online,
-            "max_players": status.players.max,
-            "version": status.version.name
         }
     except Exception as e:
         print(f"Error checking server {ip}: {e}")
@@ -60,3 +55,7 @@ def check_server(ip):
             "ip": ip,
             "online": False
         }
+
+if __name__ == "__main__":
+    print(scan_pages(2))
+    print(scan_pages(10000000))
