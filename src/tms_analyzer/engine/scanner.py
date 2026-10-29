@@ -4,6 +4,8 @@ from mcstatus import JavaServer
 
 def scan_pages(num=1):
     response = httpx.get(f"https://minecraft-mp.com/servers/latest/{num}/")
+    if response.status_code == 404:
+        return
 
     soup = BeautifulSoup(response.text, "html.parser")
 
@@ -26,6 +28,10 @@ def scan_pages(num=1):
                 for tag in row.select(".btn-tag")
             ]
         
+        url_div = row.select_one("div.server-card")
+        if url_div:
+            url = f"https://minecraft-mp.com{url_div.select_one("a").get("href")}"
+        
         a_version = row.select_one(
         "a.btn.btn-default.btn-xs.btn-block-xs.btn-version-fade.text-left"
     )
@@ -36,7 +42,8 @@ def scan_pages(num=1):
             "ip": ip_text,
             "tags": tags,
             "enabled": True,
-            "version": version_text
+            "version": version_text,
+            "url":url
         })
     return data
 

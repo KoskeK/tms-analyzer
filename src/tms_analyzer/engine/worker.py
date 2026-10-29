@@ -3,27 +3,33 @@ from sqlalchemy.orm import Session
 
 from tms_analyzer.shared.database import DATABASE_URL
 from tms_analyzer.shared.models import Server, Report
+from tms_analyzer.engine.scanner import scan_pages
+from dotenv import load_dotenv
+import os
 
-engine = create_engine(DATABASE_URL)
+if __name__ == "__main__":
 
-with Session(engine) as session:
-    # Read all servers
-    servers = session.scalars(
-        select(Server)
-    ).all()
+    load_dotenv()
 
-    for server in servers:
-        print(server.id, server.ip)
+    engine = create_engine(DATABASE_URL)
 
-    # Add a new report for the first server
-    if servers:
-        report = Report(
-            server_id=servers[0].id,
-            player_count=12,
-            online=True,
-        )
+    with Session(engine) as session:
+        pageNum = 1
+        while True:
+            servers = scan_pages(pageNum)
+            if len(servers)<=5:
+                break
+            else:
+                for server in servers:
+                    if session.scalars(select(Server).where(Server.ip==server["ip"])) != None:
+                        break
+                    else:
+                        formatted = Server(
+                            ip=server["ip"],
+                            tags=str(server["tags"]),
+                            url=server["url"],
+                            version=server["version"]
+                        )
+                        session.commit()
 
-        session.add(report)
-        session.commit()
-
-engine.dispose()
+    engine.dispose()
