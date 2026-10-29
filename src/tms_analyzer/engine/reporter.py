@@ -2,8 +2,8 @@ from mcstatus import JavaServer
 from sqlalchemy import create_engine, select
 from sqlalchemy.orm import Session
 
-from database import DATABASE_URL
-from models import Server, Report
+from tms_analyzer.shared.database import DATABASE_URL
+from tms_analyzer.shared.models import Server, Report
 
 def check_server(ip, server_id):
     try:
