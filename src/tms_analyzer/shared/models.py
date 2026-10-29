@@ -5,7 +5,7 @@ from sqlalchemy import (
 )
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from database import Base
+from tms_analyzer.shared.database import Base
 
 
 class Server(Base):
