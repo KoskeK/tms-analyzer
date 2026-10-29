@@ -3,7 +3,6 @@ from sqlalchemy.orm import Session
 
 from tms_analyzer.shared.database import DATABASE_URL
 from tms_analyzer.shared.models import Server, Report
-from tms_analyzer.engine.scanner import scan_pages
 from dotenv import load_dotenv
 import os
 import httpx
