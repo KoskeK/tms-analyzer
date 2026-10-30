@@ -1,4 +1,4 @@
-from sqlalchemy import create_engine, select
+from sqlalchemy import select, exists
 from sqlalchemy.orm import Session
 
 from tms_analyzer.shared.database import init_db
@@ -69,7 +69,7 @@ if __name__ == "__main__":
                 break
             else:
                 for server in servers:
-                    if session.scalars(select(Server).where(Server.ip==server.ip)) != None:
+                    if session.scalar(select(exists(Server).where(Server.ip==server.ip))):
                         break
                     else:
                         session.add(server)
