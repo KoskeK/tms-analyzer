@@ -30,8 +30,9 @@ if __name__ == "__main__":
         servers = session.scalars(
             select(Server)
         ).all()
+        print(len(servers))
 
         for server in servers:
-            session.add(check_server(server.ip))
+            session.add(check_server(server.ip,server.id))
         session.commit()
     engine.dispose()
