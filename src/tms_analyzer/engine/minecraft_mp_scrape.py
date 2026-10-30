@@ -65,6 +65,7 @@ def scan_pages(num=1):
 
 if __name__ == "__main__":
     engine = init_db()
+    logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.DEBUG)
     logging.info("Logging started...")
     logging.info("Engine intiated...")
 
