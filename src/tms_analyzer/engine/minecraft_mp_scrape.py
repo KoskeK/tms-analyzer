@@ -60,7 +60,7 @@ def scan_pages(num=1):
     return data
 
 if __name__ == "__main__":
-    engine = create_engine(DATABASE_URL)
+    engine = init_db()
 
     with Session(engine) as session:
         pageNum = 1
