@@ -21,7 +21,7 @@ if __name__ == "__main__":
             print("No servers found on the website...")
         else:
             for server in servers:
-                if select(exists(Server).where(Server.ip==server.ip)):
+                if session.scalar(select(exists(Server).where(Server.ip==server.ip))):
                     print(session.scalars(select(Server).where(Server.ip==server.ip)))
                     print("Server alredy exists in the DB...")
                 else:
