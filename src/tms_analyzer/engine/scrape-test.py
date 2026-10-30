@@ -15,7 +15,7 @@ if __name__ == "__main__":
     print("Database connector engine intialized...")
     with Session(engine) as session:
         print("Database connector session made...")
-        pageNum = 1
+        pageNum = 2
         servers = scan_pages(pageNum)
         if servers == None:
             print("No servers found on the website...")
