@@ -1,7 +1,7 @@
 from sqlalchemy import create_engine, select
 from sqlalchemy.orm import Session
 
-from tms_analyzer.shared.database import DATABASE_URL
+from tms_analyzer.shared.database import init_db
 from tms_analyzer.shared.models import Server, Report
 from dotenv import load_dotenv
 import os
