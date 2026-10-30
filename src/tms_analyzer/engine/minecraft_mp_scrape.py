@@ -10,13 +10,13 @@ from bs4 import BeautifulSoup
 import time
 import logging
 
-def scan_pages(logger: logging.Logger, num=1):
+def scan_pages(num=1):
     if num ==1:
         response = httpx.get(f"https://minecraft-mp.com/servers/latest/")
-        logger.info("Scanning https://minecraft-mp.com/servers/latest/")
+        logging.info("Scanning https://minecraft-mp.com/servers/latest/")
     else:
         response = httpx.get(f"https://minecraft-mp.com/servers/latest/{num}/")
-        logger.info(f"Scanning {f"https://minecraft-mp.com/servers/latest/{num}/"}")
+        logging.info(f"Scanning {f"https://minecraft-mp.com/servers/latest/{num}/"}")
     if response.status_code == 404:
         return
 
@@ -24,7 +24,7 @@ def scan_pages(logger: logging.Logger, num=1):
 
     data = []
     rows = soup.select("tr")
-    logger.info(f"Found {len(rows)} servers!")
+    logging.info(f"Found {len(rows)} servers!")
     for row in rows:
         # Server IP
         a = row.select_one("div.server-ip-group a.btn-server-ip")
@@ -65,27 +65,26 @@ def scan_pages(logger: logging.Logger, num=1):
 
 if __name__ == "__main__":
     engine = init_db()
-    logger = logging.getLogger(__name__)
-    logger.info("Logging started...")
-    logger.info("Engine intiated...")
+    logging.info("Logging started...")
+    logging.info("Engine intiated...")
 
     with Session(engine) as session:
-        logger.info("DB session loaded...")
+        logging.info("DB session loaded...")
         pageNum = 1
-        logger.info("Scanning started...")
+        logging.info("Scanning started...")
         while True:
             time.sleep(0.2)
             servers = scan_pages(logger, pageNum)
             if servers == None:
-                logger.info("The value of scan_pages was None. Breaking the loop")
+                logging.info("The value of scan_pages was None. Breaking the loop")
                 break
             else:
                 for server in servers:
                     if session.scalar(select(exists(Server).where(Server.ip==server.ip))):
-                        logger.info(f"Server {server.ip} alredy exists in the DB, skipping...")
+                        logging.info(f"Server {server.ip} alredy exists in the DB, skipping...")
                     else:
                         session.add(server)
-                        logger.info(f"Server {server.ip} added!")
+                        logging.info(f"Server {server.ip} added!")
                         session.commit()
 
     engine.dispose()
