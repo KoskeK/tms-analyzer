@@ -50,11 +50,11 @@ def scan_pages(num=1):
         # Combine
         data.append(
         Server(
-            ip=ip_text,
-            tags=str(tags),
+            ip=ip_text if ip_text else "broken",
+            tags=str(tags) if tags else "broken",
             enabled=True,
-            version=version_text,
-            url=url
+            version=version_text if version_text else "broken",
+            url=url if url else "broken"
         )
         )
     return data
