@@ -8,20 +8,24 @@ import os
 import httpx
 from bs4 import BeautifulSoup
 import time
+import logging
 
-def scan_pages(num=1):
+def scan_pages(logger: logging.Logger, num=1):
     if num ==1:
         response = httpx.get(f"https://minecraft-mp.com/servers/latest/")
+        logger.info(f"Scanning {https://minecraft-mp.com/servers/latest/}")
     else:
         response = httpx.get(f"https://minecraft-mp.com/servers/latest/{num}/")
+        logger.info(f"Scanning {f"https://minecraft-mp.com/servers/latest/{num}/"}")
     if response.status_code == 404:
         return
 
     soup = BeautifulSoup(response.text, "html.parser")
 
     data = []
-
-    for row in soup.select("tr"):
+    rows = soup.select("tr")
+    logger.info(f"Found {len(rows)} servers!")
+    for row in rows:
         # Server IP
         a = row.select_one("div.server-ip-group a.btn-server-ip")
         if not a:
@@ -61,20 +65,27 @@ def scan_pages(num=1):
 
 if __name__ == "__main__":
     engine = init_db()
+    logger = logging.getLogger(__name__)
+    logger.info("Logging started...")
+    logger.info("Engine intiated...")
 
     with Session(engine) as session:
+        logger.info("DB session loaded...")
         pageNum = 1
+        logger.info("Scanning started...")
         while True:
             time.sleep(0.2)
             servers = scan_pages(pageNum)
             if servers == None:
+                logger.info("The value of scan_pages was None. Breaking the loop")
                 break
             else:
                 for server in servers:
                     if session.scalar(select(exists(Server).where(Server.ip==server.ip))):
-                        break
+                        logger.info(f"Server {server.ip} alredy exists in the DB, skipping...")
                     else:
                         session.add(server)
+                        logger.info(f"Server {server.ip} added!")
                         session.commit()
 
     engine.dispose()
