@@ -1,5 +1,5 @@
 from tms_analyzer.engine.minecraft_mp_scrape import scan_pages
-from sqlalchemy import select
+from sqlalchemy import select, exists
 from sqlalchemy.orm import Session
 
 from tms_analyzer.shared.database import init_db
@@ -21,7 +21,7 @@ if __name__ == "__main__":
             print("No servers found on the website...")
         else:
             for server in servers:
-                if session.scalars(select(Server).where(Server.ip==server.ip)) != None:
+                if select(exists(Server).where(Server.ip==server.ip)):
                     print(session.scalars(select(Server).where(Server.ip==server.ip)))
                     print("Server alredy exists in the DB...")
                 else:
