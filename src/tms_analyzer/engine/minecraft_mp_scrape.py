@@ -13,7 +13,7 @@ import logging
 def scan_pages(logger: logging.Logger, num=1):
     if num ==1:
         response = httpx.get(f"https://minecraft-mp.com/servers/latest/")
-        logger.info(f"Scanning {https://minecraft-mp.com/servers/latest/}")
+        logger.info("Scanning https://minecraft-mp.com/servers/latest/")
     else:
         response = httpx.get(f"https://minecraft-mp.com/servers/latest/{num}/")
         logger.info(f"Scanning {f"https://minecraft-mp.com/servers/latest/{num}/"}")
