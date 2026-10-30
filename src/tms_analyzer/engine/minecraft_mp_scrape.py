@@ -87,5 +87,6 @@ if __name__ == "__main__":
                         session.add(server)
                         logging.info(f"Server {server.ip} added!")
                         session.commit()
+            pageNum+=1
 
     engine.dispose()
