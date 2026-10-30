@@ -10,6 +10,7 @@ from bs4 import BeautifulSoup
 
 def scan_pages(num=1):
     response = httpx.get(f"https://minecraft-mp.com/servers/latest/{num}/")
+    print(response.status_code)
     if response.status_code == 404:
         return
 
