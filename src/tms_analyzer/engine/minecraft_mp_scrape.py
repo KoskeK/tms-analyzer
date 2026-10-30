@@ -50,7 +50,7 @@ def scan_pages(num=1):
         data.append(
         Server(
             ip=ip_text,
-            tags=tags,
+            tags=str(tags),
             enabled=True,
             version=version_text,
             url=url
