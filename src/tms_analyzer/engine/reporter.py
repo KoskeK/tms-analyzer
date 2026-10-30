@@ -1,8 +1,8 @@
 from mcstatus import JavaServer
-from sqlalchemy import create_engine, select
+from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from tms_analyzer.shared.database import DATABASE_URL
+from tms_analyzer.shared.database import init_db
 from tms_analyzer.shared.models import Server, Report
 
 def check_server(ip, server_id):
@@ -23,7 +23,7 @@ def check_server(ip, server_id):
         )
 
 if __name__ == "__main__":
-    engine = create_engine(DATABASE_URL)
+    engine = init_db()
 
     with Session(engine) as session:
         # Read all servers

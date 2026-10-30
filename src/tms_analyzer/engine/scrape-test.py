@@ -1,8 +1,8 @@
 from tms_analyzer.engine.minecraft_mp_scrape import scan_pages
-from sqlalchemy import create_engine, select
+from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from tms_analyzer.shared.database import DATABASE_URL
+from tms_analyzer.shared.database import init_db
 from tms_analyzer.shared.models import Server, Report
 from dotenv import load_dotenv
 import os
@@ -11,7 +11,7 @@ from bs4 import BeautifulSoup
 
 if __name__ == "__main__":
     print("Starting test...")
-    engine = create_engine(DATABASE_URL)
+    engine = init_db()
     print("Database connector engine intialized...")
     with Session(engine) as session:
         print("Database connector session made...")
