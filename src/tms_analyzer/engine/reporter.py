@@ -5,6 +5,9 @@ from sqlalchemy.orm import Session
 from tms_analyzer.shared.database import init_db
 from tms_analyzer.shared.models import Server, Report
 
+import tqdm
+import logging
+
 def check_server(ip, server_id):
     try:
         server = JavaServer.lookup(ip)
@@ -15,7 +18,7 @@ def check_server(ip, server_id):
             player_count=status.players.online
         )
     except Exception as e:
-        print(f"Error checking server {ip}: {e}")
+        logging.warn(f"Error checking server {ip}: {e}")
         return Report(
             server_id=server_id,
             player_count=0,
@@ -30,9 +33,10 @@ if __name__ == "__main__":
         servers = session.scalars(
             select(Server)
         ).all()
-        print(len(servers))
+        pbar = tqdm.tqdm(desc="Scanning server", total=len(servers))
 
         for server in servers:
             session.add(check_server(server.ip,server.id))
+            pbar.update(1)
         session.commit()
     engine.dispose()
