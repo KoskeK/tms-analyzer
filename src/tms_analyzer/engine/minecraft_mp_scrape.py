@@ -75,7 +75,7 @@ if __name__ == "__main__":
         logger.info("Scanning started...")
         while True:
             time.sleep(0.2)
-            servers = scan_pages(pageNum)
+            servers = scan_pages(logger, pageNum)
             if servers == None:
                 logger.info("The value of scan_pages was None. Breaking the loop")
                 break
