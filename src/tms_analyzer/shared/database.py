@@ -23,7 +23,7 @@ def init_db():
 
     engine = create_engine(DATABASE_URL)
     # Import models to register their tables with Base
-    from tms_analyzer import models
+    from tms_analyzer.shared import models
 
-    Base.metadata.create_all(engine)
+    models.Base.metadata.create_all(engine)
     return engine
