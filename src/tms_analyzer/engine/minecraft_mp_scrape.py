@@ -7,6 +7,7 @@ from dotenv import load_dotenv
 import os
 import httpx
 from bs4 import BeautifulSoup
+import time
 
 def scan_pages(num=1):
     if num ==1:
@@ -64,6 +65,7 @@ if __name__ == "__main__":
     with Session(engine) as session:
         pageNum = 1
         while True:
+            time.sleep(0.2)
             servers = scan_pages(pageNum)
             if servers == None:
                 break
