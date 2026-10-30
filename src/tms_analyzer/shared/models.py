@@ -16,6 +16,7 @@ class Server(Base):
     tags: Mapped[str] = mapped_column(String(1200), default="")
     url: Mapped[str] = mapped_column(String(1200))
     version: Mapped[str] = mapped_column(String(80))
+    enabled: Mapped[bool] = mapped_column(Boolean())
 
     reports: Mapped[list["Report"]] = relationship(
         back_populates="server",
