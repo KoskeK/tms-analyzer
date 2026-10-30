@@ -22,6 +22,7 @@ if __name__ == "__main__":
         else:
             for server in servers:
                 if session.scalars(select(Server).where(Server.ip==server.ip)) != None:
+                    print(session.scalars(select(Server).where(Server.ip==server.ip)))
                     print("Server alredy exists in the DB...")
                 else:
                     print("Server info scanned, adding to db...")
