@@ -2,8 +2,7 @@ from sqlalchemy import select, exists
 from sqlalchemy.orm import Session
 
 from tms_analyzer.shared.database import init_db
-from tms_analyzer.shared.models import Server, Report
-from dotenv import load_dotenv
+from tms_analyzer.shared.models import Server
 import os
 import httpx
 from bs4 import BeautifulSoup
@@ -82,7 +81,8 @@ if __name__ == "__main__":
             else:
                 for server in servers:
                     if session.scalar(select(exists(Server).where(Server.ip==server.ip))):
-                        logging.info(f"Server {server.ip} alredy exists in the DB, skipping...")
+                        logging.info(f"Server {url} found in the DB, stopping the scraping...")
+                        break
                     else:
                         session.add(server)
                         logging.info(f"Server {server.ip} added!")

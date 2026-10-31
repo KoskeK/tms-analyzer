@@ -17,6 +17,10 @@ class Server(Base):
     url: Mapped[str] = mapped_column(String(1200))
     version: Mapped[str] = mapped_column(String(80))
     enabled: Mapped[bool] = mapped_column(Boolean())
+    addedTime: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        default=lambda: datetime.now(timezone.utc),
+    )
 
     reports: Mapped[list["Report"]] = relationship(
         back_populates="server",
