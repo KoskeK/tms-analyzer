@@ -77,7 +77,7 @@ def scrape():
             else:
                 for server in servers:
                     if session.scalar(select(exists(Server).where(Server.ip==server.ip))):
-                        if session.scalar(select(exists(Server).where(Serber.url==server.url))):
+                        if session.scalar(select(exists(Server).where(Server.url==server.url))):
                             logging.info(f"Server {server.url} found in the DB, stopping the scraping...")
                             break
                         else:
