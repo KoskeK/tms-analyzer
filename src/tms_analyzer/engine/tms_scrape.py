@@ -86,7 +86,7 @@ def scrape():
                     logging.warning(f"Page {url} answered with code {response.status}")
                     browser.close()
                     return
-                servers = extract_servers(url, page.content())
+                servers = extract_servers(page.content())
                 if not servers:
                     logging.warn(f"No servers found on page {url}, aborting...")
                 for server in servers:
