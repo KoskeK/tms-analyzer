@@ -71,7 +71,7 @@ def scrape():
                 else:
                     url = f"https://topminecraftservers.org/sort/new/page/{pageNum}"
                 page.goto(url)
-                page.wait_for_timeout(1000)
+                page.wait_for_load_state()
                 if response.status != 200 or response.url != url:
                     logging.warning(f"Page {url} answered with code {response.status}")
                     browser.close()
@@ -88,3 +88,6 @@ def scrape():
                         session.add(server)
                 session.commit()
         browser.close()
+
+if __name__ == "__main__":
+    scrape()
