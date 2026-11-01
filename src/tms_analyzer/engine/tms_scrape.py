@@ -91,10 +91,13 @@ def scrape():
                     logging.warn(f"No servers found on page {url}, aborting...")
                 for server in servers:
                     if session.scalar(select(exists().where(Server.ip==server.ip))):
-                        logging.info(f"Server {server.ip} alredy in the database")
+                        logging.info(f"Server {server.ip} alredy in the database, ending scraping...")
+                        browser.close()
+                        return
                     else:
                         session.add(server)
                 session.commit()
+                pageNum += 1
         browser.close()
 
 if __name__ == "__main__":
