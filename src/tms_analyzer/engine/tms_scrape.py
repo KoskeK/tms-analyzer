@@ -63,6 +63,7 @@ def extract_servers(html):
 
 def scrape():
     with InvisiblePlaywright(headless=True) as browser:
+        engine = init_db()
         with Session(engine) as session:
             while True:
                 page = browser.new_page()
