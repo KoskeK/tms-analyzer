@@ -62,12 +62,8 @@ def scan_pages(num=1):
         )
     return data
 
-if __name__ == "__main__":
+def scrape():
     engine = init_db()
-    logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.DEBUG)
-    logging.info("Logging started...")
-    logging.info("Engine intiated...")
-
     with Session(engine) as session:
         logging.info("DB session loaded...")
         pageNum = 1
