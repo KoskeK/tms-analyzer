@@ -34,9 +34,16 @@ def extract_servers(html):
             'td.server-info span[rel="tag"]'
         )
 
+        # Extract url
+        url_element = row.select_one(
+            'a.visible-sm.visible-md.visible-lg'
+        )
+
         # Skip rows without an IP
         if not ip_element:
             continue
+            
+        url = f"https://topminecraftservers.org{url_element.get('href')}"
 
         ip = ip_element.get_text(strip=True)
 
@@ -55,7 +62,8 @@ def extract_servers(html):
             ip=ip,
             version=version,
             tags=str(tags),
-            enabled=True
+            enabled=True,
+            url=url
         ))
 
     return servers
@@ -78,7 +86,7 @@ def scrape():
                     logging.warning(f"Page {url} answered with code {response.status}")
                     browser.close()
                     return
-                servers = extract_servers(page.content())
+                servers = extract_servers(url, page.content())
                 if not servers:
                     logging.warn(f"No servers found on page {url}, aborting...")
                 for server in servers:
