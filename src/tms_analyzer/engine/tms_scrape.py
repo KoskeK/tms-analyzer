@@ -68,6 +68,17 @@ def extract_servers(html):
 
     return servers
 
+def handle_route(route):
+    try:
+        resource_type = route.request.resource_type
+
+        if resource_type in ("image", "media", "font", "stylesheet"):
+            route.abort()
+        else:
+            route.continue_()
+
+    except Exception as e:
+        logging.debug(f"Route interception error: {e}")
 
 def scrape():
     with InvisiblePlaywright(headless=True) as browser:
@@ -75,31 +86,24 @@ def scrape():
         with Session(engine) as session:
             pageNum = 1
             page = browser.new_page()
-            page.route(
-                "**/*",
-                lambda route: route.abort()
-                if route.request.resource_type in ["image", "media", "font", "stylesheet"]
-                else route.continue_()
-            )
+            page.route("**/*", handle_route)
             while True:
                 if pageNum == 1:
                     url = "https://topminecraftservers.org/sort/new"
                 else:
                     url = f"https://topminecraftservers.org/sort/new/page/{pageNum}"
                 response = page.goto(url)
-                page.wait_for_load_state()
                 if response.status != 200 or response.url != url:
                     logging.warning(f"Page {url} answered with code {response.status}")
-                    browser.close()
                     return
                 servers = extract_servers(page.content())
                 if not servers:
-                    logging.warn(f"No servers found on page {url}, aborting...")
+                    logging.warning(f"No servers found on page {url}, aborting...")
+                    return
                 for server in servers:
                     if session.scalar(select(exists().where(Server.ip==server.ip))):
                         if session.scalar(select(exists().where(Server.url==server.url))):
                             logging.info(f"Server {server.url} alredy in the database, ending scraping...")
-                            browser.close()
                             return
                         else:
                             logging.info(f"Server {server.ip} found from a different source, skipping...")
