@@ -72,7 +72,7 @@ def scrape():
                     url = "https://topminecraftservers.org/sort/new"
                 else:
                     url = f"https://topminecraftservers.org/sort/new/page/{pageNum}"
-                page.goto(url)
+                response = page.goto(url)
                 page.wait_for_load_state()
                 if response.status != 200 or response.url != url:
                     logging.warning(f"Page {url} answered with code {response.status}")
