@@ -3,14 +3,23 @@ from pathlib import Path
 
 from dotenv import load_dotenv
 from sqlalchemy import create_engine
-from sqlalchemy.orm import DeclarativeBase, sessionmaker
+from sqlalchemy.orm import (
+    DeclarativeBase,
+    sessionmaker,
+    Session,
+)
 
 class Base(DeclarativeBase):
     pass
 
+
+engine = None
 SessionLocal = None
 
+
 def init_db():
+    global engine, SessionLocal
+
     load_dotenv()
 
     BASE_DIR = Path(__file__).resolve().parent
@@ -23,22 +32,25 @@ def init_db():
     )
 
     engine = create_engine(DATABASE_URL)
-    # Import models to register their tables with Base
+
+    SessionLocal = sessionmaker(
+        bind=engine,
+        autoflush=False,
+        expire_on_commit=False,
+    )
+
     from tms_analyzer.shared import models
 
-    models.Base.metadata.create_all(engine)
-    SessionLocal = sessionmaker(
-    bind=engine,
-    autoflush=False,
-    expire_on_commit=False,
-    )
+    Base.metadata.create_all(engine)
+
     return engine
+
 
 def get_db():
     if SessionLocal is None:
         raise RuntimeError("Database not initialized")
 
-    db = SessionLocal()
+    db: Session = SessionLocal()
 
     try:
         yield db
