@@ -24,7 +24,7 @@ def check_server(ip, server_id):
             server_id=server_id,
             player_count=0,
             online=False,
-            status=e
+            status=repr(e)
         )
 
 if __name__ == "__main__":
