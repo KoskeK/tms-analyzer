@@ -4,7 +4,7 @@ A system that scrapes data from various (for now only one) sources, and puts the
 
 ## How to use?
 
-First, the question is what is the purpose. If the user is simply curious about said statistics, there will be an API and a website where this data can be viewed. The data for the API is alredy being collected, which means that the API will have much fuller data than if the user was to ran it themselves. <br>
+First, the question is what is the purpose. If the user is simply curious about said statistics, there will be an API and a website where this data can be viewed. The data for the API is alredy being collected, which means that the API will have much fuller data than if the user was to ran it themselves. <br><br>
 However, since the API is not available as of now, the only way to interact with the data as of now is for the user to run the scraping themselve.<br>
 
 ### Running the base scripts
@@ -35,3 +35,6 @@ uv run src/tms_analyzer/engine/reporter.py
 ### Configuration
 The only form of configuration offered is a .env file. The only configuration option in it is the DB URL. The default configuration is SQLite, which should be more than enough for most applications. <br>
 While this script does not offer more configuration option on its own, it is reccomended to set up a cronjob to gather data periodically. The reccomended way is just to run the scraper and the reporter on their own.
+
+### What to do now?
+After setting up the project, you might want to explore the data you just collected. To do this, one can either download the .db file and use tools such as [sqlite browser](https://sqlitebrowser.org/) or [sqlviz](https://sqliteviz.com/) to take a look at it. However, a more convinient, but a bit more annoying option, is to set up [metabase](https://www.metabase.com/), and interact with the data directly from the server.

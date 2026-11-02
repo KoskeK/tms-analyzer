@@ -1,7 +1,7 @@
 [project]
 name = "tms-analyzer"
 version = "0.1.0"
-description = "Add your description here"
+description = "A script that collects data about minecraft servers"
 readme = "README.md"
 authors = [
     { name = "KoskeK", email = "koske.kanasugi@truhla.eu" }
