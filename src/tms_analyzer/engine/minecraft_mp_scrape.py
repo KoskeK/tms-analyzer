@@ -32,7 +32,7 @@ def scan_pages(num=1):
 
         ip_text = a.get_text(strip=True)
 
-        country_img = a.select_one(img)
+        country_img = a.select_one('img')
         if country_img is not None:
             country_text = country_img.get('alt')
 
