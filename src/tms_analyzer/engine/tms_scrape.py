@@ -39,13 +39,25 @@ def extract_servers(html):
             'a.visible-sm.visible-md.visible-lg'
         )
 
+        country = None
+
         country_element = row.select_one(
-            'td.server-rank.visible-sm.visible-md.visible-lg'
+            "td.server-rank"
         )
 
-        country = country_element.select_one('img').get('alt') if country_element else None
-        if country is not None:
-            country.replace(" Minecraft Servers","")
+        if country_element:
+            flag = country_element.select_one("img")
+
+            if flag:
+                country = (
+                    flag.get("alt")
+                    or flag.get("title")
+                )
+
+                if country:
+                    country = country.replace(
+                        " Minecraft Servers", ""
+                    ).strip()
 
         # Skip rows without an IP
         if not ip_element:
@@ -65,13 +77,17 @@ def extract_servers(html):
             for tag in tag_elements
             if tag.get_text(strip=True)
         ]
+        tagStr = ""
+        for tag in tags:
+            tagStr+=f"|{tag}"
 
         servers.append(Server(
             ip=ip,
             version=version,
-            tags=str(tags),
+            tags=tagStr,
             enabled=True,
-            url=url
+            url=url,
+            country=country
         ))
 
     return servers

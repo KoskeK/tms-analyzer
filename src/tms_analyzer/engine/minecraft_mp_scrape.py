@@ -44,6 +44,9 @@ def scan_pages(num=1):
                 tag.get_text(strip=True)
                 for tag in row.select(".btn-tag")
             ]
+        tagStr = ""
+        for tag in tags:
+            tagStr+=f"|{tag}"
         
         url_div = row.select_one("div.server-card")
         if url_div:
