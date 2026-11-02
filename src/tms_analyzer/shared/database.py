@@ -8,6 +8,7 @@ from sqlalchemy.orm import DeclarativeBase
 class Base(DeclarativeBase):
     pass
 
+SessionLocal = None
 
 def init_db():
     load_dotenv()
@@ -26,4 +27,20 @@ def init_db():
     from tms_analyzer.shared import models
 
     models.Base.metadata.create_all(engine)
+    SessionLocal = sessionmaker(
+    bind=engine,
+    autoflush=False,
+    expire_on_commit=False,
+    )
     return engine
+
+def get_db():
+    if SessionLocal is None:
+        raise RuntimeError("Database not initialized")
+
+    db = SessionLocal()
+
+    try:
+        yield db
+    finally:
+        db.close()

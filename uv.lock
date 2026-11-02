@@ -822,6 +822,7 @@ dependencies = [
     { name = "invisible-playwright" },
     { name = "load-dotenv" },
     { name = "mcstatus" },
+    { name = "pydantic" },
     { name = "sqlalchemy" },
     { name = "tqdm" },
 ]
@@ -835,6 +836,7 @@ requires-dist = [
     { name = "invisible-playwright", specifier = ">=0.43.0" },
     { name = "load-dotenv", specifier = ">=0.1.0" },
     { name = "mcstatus", specifier = ">=14.2.0" },
+    { name = "pydantic", specifier = ">=2.14.1" },
     { name = "sqlalchemy", specifier = ">=2.1.6" },
     { name = "tqdm", specifier = ">=4.70.1" },
 ]
