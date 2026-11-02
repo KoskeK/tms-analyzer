@@ -32,6 +32,10 @@ def scan_pages(num=1):
 
         ip_text = a.get_text(strip=True)
 
+        country_img = a.select_one(img)
+        if country_img is not None:
+            country_text = country_img.get('alt')
+
         # Tags
         tags_div = row.select_one("div.list-server-tags-scroll")
         tags = []
@@ -57,7 +61,8 @@ def scan_pages(num=1):
             tags=str(tags) if tags else "broken",
             enabled=True,
             version=version_text if version_text else "broken",
-            url=url if url else "broken"
+            url=url if url else "broken",
+            country=country_text
         )
         )
     return data

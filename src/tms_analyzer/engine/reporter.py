@@ -15,14 +15,16 @@ def check_server(ip, server_id):
         return Report(
             server_id=server_id,
             online=True,
-            player_count=status.players.online
+            player_count=status.players.online,
+            status="Normal"
         )
     except Exception as e:
         logging.warn(f"Error checking server {ip}: {e}")
         return Report(
             server_id=server_id,
             player_count=0,
-            online=False
+            online=False,
+            status=e
         )
 
 if __name__ == "__main__":
@@ -36,7 +38,8 @@ if __name__ == "__main__":
         pbar = tqdm.tqdm(desc="Scanning server", total=len(servers))
 
         for server in servers:
-            session.add(check_server(server.ip,server.id))
+            report = check_server(server.ip,server.id)
+            session.add(report)
             pbar.update(1)
         session.commit()
     engine.dispose()

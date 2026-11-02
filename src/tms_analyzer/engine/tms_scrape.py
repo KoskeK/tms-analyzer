@@ -39,6 +39,14 @@ def extract_servers(html):
             'a.visible-sm.visible-md.visible-lg'
         )
 
+        country_element = row.select_one(
+            'td.server-rank.visible-sm.visible-md.visible-lg'
+        )
+
+        country = country_element.select_one('img').get('alt') if country_element else None
+        if country is not None:
+            country.replace(" Minecraft Servers","")
+
         # Skip rows without an IP
         if not ip_element:
             continue

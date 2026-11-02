@@ -17,6 +17,7 @@ class Server(Base):
     url: Mapped[str] = mapped_column(String(1200))
     version: Mapped[str] = mapped_column(String(80))
     enabled: Mapped[bool] = mapped_column(Boolean())
+    country: Mapped[str] = mapped_column(String(80), default="Unavailable")
     addedTime: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         default=lambda: datetime.now(timezone.utc),
@@ -37,6 +38,7 @@ class Report(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     player_count: Mapped[int] = mapped_column(Integer)
     online: Mapped[bool] = mapped_column(Boolean, default=False)
+    status: Mapped[str] = mapped_column(String(100), default="Normal")
 
     server_id: Mapped[int] = mapped_column(
         ForeignKey("servers.id"),

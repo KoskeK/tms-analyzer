@@ -8,6 +8,7 @@ class ReportResponse(BaseModel):
     online: bool
     server_id: int
     time: datetime
+    status: str
 
     model_config = ConfigDict(from_attributes=True)
 
@@ -19,6 +20,7 @@ class ServerResponse(BaseModel):
     url: str
     version: str
     enabled: bool
+    country: str
     addedTime: datetime
 
     model_config = ConfigDict(from_attributes=True)
