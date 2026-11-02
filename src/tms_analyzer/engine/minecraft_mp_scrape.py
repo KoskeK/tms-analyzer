@@ -61,7 +61,7 @@ def scan_pages(num=1):
         data.append(
         Server(
             ip=ip_text if ip_text else "broken",
-            tags=str(tags) if tags else "broken",
+            tags=tagStr if tagStr else "broken",
             enabled=True,
             version=version_text if version_text else "broken",
             url=url if url else "broken",
