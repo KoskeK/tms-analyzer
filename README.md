@@ -9,7 +9,7 @@ The script is still under development, and I often change my mind about things, 
 
 ### Running the base scripts
 
-0. Download appropriate software. This project needs [python3](https://python.org) and [uv](https://docs.astral.sh/uv/), and install required packages packages for [playwright](https://github.com/feder-cr/invisible_playwright). This may change depending on your setup.
+0. Download appropriate software. This project needs [python3](https://python.org) and [uv](https://docs.astral.sh/uv/), and install required packages for [playwright](https://github.com/feder-cr/invisible_playwright). This may change depending on your setup.
 1. Clone this repo, and run
 ```sh
 uv sync
