@@ -1,10 +1,10 @@
-from invisible_playwright import InvisiblePlaywright
 import logging
 from bs4 import BeautifulSoup
 from sqlalchemy import select, exists
 from sqlalchemy.orm import Session
 from tms_analyzer.shared.database import init_db
 from tms_analyzer.shared.models import Server
+import curl_cffi
 
 def extract_servers(html):
     soup = BeautifulSoup(html, "html.parser")
@@ -62,8 +62,11 @@ def extract_servers(html):
         # Skip rows without an IP
         if not ip_element:
             continue
-            
-        url = f"https://topminecraftservers.org{url_element.get('href')}"
+
+        if url_element:
+            url = f"https://topminecraftservers.org{url_element.get('href')}"
+        else:
+            url = Nones
 
         ip = ip_element.get_text(strip=True)
 
@@ -92,50 +95,34 @@ def extract_servers(html):
 
     return servers
 
-def handle_route(route):
-    try:
-        resource_type = route.request.resource_type
-
-        if resource_type in ("image", "media", "font", "stylesheet"):
-            route.abort()
-        else:
-            route.continue_()
-
-    except Exception as e:
-        logging.debug(f"Route interception error: {e}")
-
 def scrape():
-    with InvisiblePlaywright(headless=True) as browser:
-        engine = init_db()
-        with Session(engine) as session:
-            pageNum = 1
-            page = browser.new_page()
-            page.route("**/*", handle_route)
-            while True:
-                if pageNum == 1:
-                    url = "https://topminecraftservers.org/sort/new"
-                else:
-                    url = f"https://topminecraftservers.org/sort/new/page/{pageNum}"
-                response = page.goto(url)
-                if response.status != 200 or response.url != url:
-                    logging.warning(f"Page {url} answered with code {response.status}")
-                    return
-                servers = extract_servers(page.content())
-                if not servers:
-                    logging.warning(f"No servers found on page {url}, aborting...")
-                    return
-                for server in servers:
-                    if session.scalar(select(exists().where(Server.ip==server.ip))):
-                        if session.scalar(select(exists().where(Server.url==server.url))):
-                            logging.info(f"Server {server.url} alredy in the database, ending scraping...")
-                            return
-                        else:
-                            logging.info(f"Server {server.ip} found from a different source, skipping...")
+    engine = init_db()
+    with Session(engine) as session:
+        pageNum = 1
+        while True:
+            if pageNum == 1:
+                url = "https://topminecraftservers.org/sort/new"
+            else:
+                url = f"https://topminecraftservers.org/sort/new/page/{pageNum}"
+            response = curl_cffi.get(url=url, impersonate="chromes")
+            if response.status_code != 200 or response.url != url:
+                logging.warning(f"Page {url} answered with code {response.status}")
+                return
+            servers = extract_servers(response.content())
+            if not servers:
+                logging.warning(f"No servers found on page {url}, aborting...")
+                return
+            for server in servers:
+                if session.scalar(select(exists().where(Server.ip==server.ip))):
+                    if session.scalar(select(exists().where(Server.url==server.url))):
+                        logging.info(f"Server {server.url} alredy in the database, ending scraping...")
+                        return
                     else:
-                        session.add(server)
-                session.commit()
-                pageNum += 1
-        browser.close()
+                        logging.info(f"Server {server.ip} found from a different source, skipping...")
+                else:
+                    session.add(server)
+            session.commit()
+            pageNum += 1
 
 if __name__ == "__main__":
     logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.DEBUG)

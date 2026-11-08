@@ -19,7 +19,7 @@ def resolve_minecraft_target(hostname):
 
     # 1. Try SRV lookup first (if no explicit port)
     try:
-        srv_answers = await resolver.resolve(f'_minecraft._tcp.{hostname}', 'SRV')
+        srv_answers = resolver.resolve(f'_minecraft._tcp.{hostname}', 'SRV')
         for rdata in srv_answers:
             return f"{str(rdata.target).rstrip('.')}:{rdata.port}", None
     except (dns.resolver.NXDOMAIN, dns.resolver.NoAnswer, dns.exception.Timeout):
@@ -27,7 +27,7 @@ def resolve_minecraft_target(hostname):
 
     # 2. Fallback to A/AAAA record on default port 25565
     try:
-        a_answers = await resolver.resolve(hostname, 'A')
+        a_answers = resolver.resolve(hostname, 'A')
         for rdata in a_answers:
             return f"{str(rdata)}:25565", None
     except Exception as e:
@@ -49,11 +49,11 @@ def check_server(ip, server_id):
             return Report(
                 server_id=server_id,
                 online=True,
-                player_count=status.players.online,
+                player_count=0,
                 status=repr(error)
             )
     except Exception as e:
-        logging.warn(f"Error checking server {ip}: {e}")
+        logging.warning(f"Error checking server {ip}: {e}")
         return Report(
             server_id=server_id,
             player_count=0,
