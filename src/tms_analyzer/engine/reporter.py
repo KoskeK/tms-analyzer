@@ -8,8 +8,6 @@ from tms_analyzer.shared.models import Server, Report
 
 import dns.resolver
 import dns.exception
-
-import tqdm
 import logging
 
 
