@@ -1,3 +1,4 @@
+
 from mcstatus import JavaServer
 from sqlalchemy import select
 from sqlalchemy.orm import Session
@@ -5,75 +6,136 @@ from sqlalchemy.orm import Session
 from tms_analyzer.shared.database import init_db
 from tms_analyzer.shared.models import Server, Report
 
+import dns.resolver
+import dns.exception
+
 import tqdm
 import logging
 
-import dns.asyncresolver
-import dns.exception
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(message)s"
+)
+
 
 def resolve_minecraft_target(hostname):
-    resolver = dns.asyncresolver.Resolver()
-    resolver.nameservers = ['1.1.1.1', '8.8.8.8']  # Explicitly use public resolvers
+    resolver = dns.resolver.Resolver()
+    resolver.nameservers = ["1.1.1.1", "8.8.8.8"]
     resolver.timeout = 3.0
-    resolver.lifetime = 3.0
+    resolver.lifetime = 5.0
 
-    # 1. Try SRV lookup first (if no explicit port)
-    try:
-        srv_answers = resolver.resolve(f'_minecraft._tcp.{hostname}', 'SRV')
-        for rdata in srv_answers:
-            return f"{str(rdata.target).rstrip('.')}:{rdata.port}", None
-    except (dns.resolver.NXDOMAIN, dns.resolver.NoAnswer, dns.exception.Timeout):
-        pass  # Fall back to standard A/AAAA record
+    hostname = hostname.strip()
 
-    # 2. Fallback to A/AAAA record on default port 25565
+    # Preserve explicitly specified ports
+    if hostname.startswith("[") and "]:" in hostname:
+        return hostname, None
+
+    if hostname.count(":") == 1:
+        host, port = hostname.rsplit(":", 1)
+        if port.isdigit():
+            return hostname, None
+
+    # Try Minecraft SRV lookup
     try:
-        a_answers = resolver.resolve(hostname, 'A')
-        for rdata in a_answers:
-            return f"{str(rdata)}:25565", None
-    except Exception as e:
-        return None, e
+        srv_answers = resolver.resolve(
+            f"_minecraft._tcp.{hostname}",
+            "SRV"
+        )
+
+        srv = next(iter(srv_answers))
+        target = str(srv.target).rstrip(".")
+        return f"{target}:{srv.port}", None
+
+    except (
+        dns.resolver.NXDOMAIN,
+        dns.resolver.NoAnswer,
+        dns.resolver.NoNameservers,
+        dns.exception.Timeout
+    ):
+        pass
+
+    # Fall back to A / AAAA records
+    errors = []
+
+    for record_type in ("A", "AAAA"):
+        try:
+            answers = resolver.resolve(hostname, record_type)
+            address = str(next(iter(answers)))
+
+            if record_type == "AAAA":
+                address = f"[{address}]"
+
+            return f"{address}:25565", None
+
+        except (
+            dns.resolver.NXDOMAIN,
+            dns.resolver.NoAnswer,
+            dns.resolver.NoNameservers,
+            dns.exception.Timeout
+        ) as e:
+            errors.append(e)
+
+    return None, errors[-1] if errors else Exception("DNS resolution failed")
+
 
 def check_server(ip, server_id):
     try:
         host, error = resolve_minecraft_target(ip)
-        if not error:
-            server = JavaServer.lookup(host)
-            status = server.status()
+
+        if error:
             return Report(
                 server_id=server_id,
-                online=True,
-                player_count=status.players.online,
-                status="Normal"
-            )
-        else:
-            return Report(
-                server_id=server_id,
-                online=True,
+                online=False,
                 player_count=0,
-                status=repr(error)
+                status=f"DNS Error: {error!r}"
             )
-    except Exception as e:
-        logging.warning(f"Error checking server {ip}: {e}")
+
+        server = JavaServer.lookup(host)
+        status = server.status()
+
         return Report(
             server_id=server_id,
-            player_count=0,
+            online=True,
+            player_count=status.players.online,
+            status="Normal"
+        )
+
+    except Exception as e:
+        logging.warning("Error checking server %s: %s", ip, e)
+
+        return Report(
+            server_id=server_id,
             online=False,
+            player_count=0,
             status=repr(e)
         )
+
 
 if __name__ == "__main__":
     engine = init_db()
 
-    with Session(engine) as session:
-        # Read all servers
-        servers = session.scalars(
-            select(Server)
-        ).all()
-        pbar = tqdm.tqdm(desc="Scanning server", total=len(servers))
+    try:
+        with Session(engine) as session:
+            servers = session.scalars(
+                select(Server).where(Server.enabled == True)
+            ).all()
 
-        for server in servers:
-            report = check_server(server.ip,server.id)
-            session.add(report)
-            pbar.update(1)
-        session.commit()
-    engine.dispose()
+            with tqdm.tqdm(
+                total=len(servers),
+                desc="Scanning servers"
+            ) as pbar:
+
+                for server in servers:
+                    report = check_server(server.ip, server.id)
+                    session.add(report)
+                    pbar.update(1)
+
+            session.commit()
+
+    except Exception:
+        logging.exception("Scanning failed")
+        raise
+
+    finally:
+        engine.dispose()
