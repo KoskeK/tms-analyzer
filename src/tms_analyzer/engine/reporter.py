@@ -118,16 +118,9 @@ if __name__ == "__main__":
             servers = session.scalars(
                 select(Server).where(Server.enabled == True)
             ).all()
-
-            with tqdm.tqdm(
-                total=len(servers),
-                desc="Scanning servers"
-            ) as pbar:
-
-                for server in servers:
-                    report = check_server(server.ip, server.id)
-                    session.add(report)
-                    pbar.update(1)
+            for server in servers:
+                report = check_server(server.ip, server.id)
+                session.add(report)
 
             session.commit()
 
