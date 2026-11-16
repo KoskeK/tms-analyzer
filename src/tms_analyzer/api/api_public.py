@@ -581,4 +581,4 @@ def health(conn: Connection=Depends(get_conn)):
 if __name__ == '__main__':
     import uvicorn
     logging.basicConfig(level=logging.INFO)
-    uvicorn.run(app, host=os.environ.get('TMS_API_HOST', '127.0.0.1'), port=int(os.environ.get('TMS_API_PORT', '8000')))
+    uvicorn.run(app, host=os.environ.get('TMS_API_HOST', '0.0.0.0'), port=int(os.environ.get('TMS_API_PORT', '8000')))
