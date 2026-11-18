@@ -122,6 +122,26 @@ if __name__ == "__main__":
                 report = check_server(server.ip, server.id)
                 session.add(report)
 
+            has_normal = session.scalar(
+            select(Report.id)
+            .where(
+                Report.server_id == server.id,
+                Report.status == "Normal",
+                Report.id.in_(
+                    select(Report.id)
+                    .where(Report.server_id == server.id)
+                    .order_by(Report.time.desc())
+                    .limit(5)
+                )
+            )
+            .limit(1)
+        )
+
+            if has_normal is None:
+                server.enabled = False
+            else:
+                server.enabled = True
+
             session.commit()
 
     except Exception:
