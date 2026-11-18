@@ -15,9 +15,79 @@ logging.basicConfig(
     format="%(asctime)s [%(levelname)s] %(message)s"
 )
 
+def resolve_minecraft_target(hostname):
+    resolver = dns.resolver.Resolver()
+    resolver.nameservers = ["1.1.1.1", "8.8.8.8"]
+    resolver.timeout = 3.0
+    resolver.lifetime = 5.0
+
+    hostname = hostname.strip()
+
+    # Preserve explicitly specified ports
+    if hostname.startswith("[") and "]:" in hostname:
+        return hostname, None
+
+    if hostname.count(":") == 1:
+        host, port = hostname.rsplit(":", 1)
+        if port.isdigit():
+            return hostname, None
+
+    # Try Minecraft SRV lookup
+    try:
+        srv_answers = resolver.resolve(
+            f"_minecraft._tcp.{hostname}",
+            "SRV"
+        )
+
+        srv = next(iter(srv_answers))
+        target = str(srv.target).rstrip(".")
+        return f"{target}:{srv.port}", None
+
+    except (
+        dns.resolver.NXDOMAIN,
+        dns.resolver.NoAnswer,
+        dns.resolver.NoNameservers,
+        dns.exception.Timeout
+    ):
+        pass
+
+    # Fall back to A / AAAA records
+    errors = []
+
+    for record_type in ("A", "AAAA"):
+        try:
+            answers = resolver.resolve(hostname, record_type)
+            address = str(next(iter(answers)))
+
+            if record_type == "AAAA":
+                address = f"[{address}]"
+
+            return f"{address}:25565", None
+
+        except (
+            dns.resolver.NXDOMAIN,
+            dns.resolver.NoAnswer,
+            dns.resolver.NoNameservers,
+            dns.exception.Timeout
+        ) as e:
+            errors.append(e)
+
+    return None, errors[-1] if errors else Exception("DNS resolution failed")
+
 def check_server(ip, server_id):
     try:
-        ms = minestat.MineStat('minecraft.frag.land')
+        host, error = resolve_minecraft_target(ip)
+
+        if error:
+            return Report(
+                server_id=server_id,
+                online=False,
+                player_count=0,
+                status=f"DNS Error: {error!r}"
+            ), None
+
+        ms = minestat.MineStat(host)
+        
         if not ms.online:
             if error:
                 return Report(
