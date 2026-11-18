@@ -16,6 +16,7 @@ dependencies = [
     "httpx>=0.28.1",
     "load-dotenv>=0.1.0",
     "mcstatus>=14.2.0",
+    "minestat>=2.7.0",
     "pydantic>=2.14.1",
     "sqlalchemy>=2.1.6",
     "tqdm>=4.70.1",

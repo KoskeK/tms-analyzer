@@ -430,6 +430,18 @@ wheels = [
 ]
 
 [[package]]
+name = "minestat"
+version = "2.7.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "dnspython" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/f2/97/de05fe6b6ead92278e43d22e61a1e919aa93cd1a68864f32a5e219e928de/minestat-2.7.0.tar.gz", hash = "sha256:e7e578e07c13a92b0ddfbe1fb3bb7025964fdcf09f0419654c73867bf24d32d3", size = 27494, upload-time = "2026-11-17T03:17:42.792Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/38/2c/b2e0936124337ebb53a39961fd265237078cfc3fd69dbfae6010c761b82e/minestat-2.7.0-py3-none-any.whl", hash = "sha256:c789d550f505cda8d281a173abef1a7da5ba6a25c48fb59d329998701f20a37b", size = 26152, upload-time = "2026-11-17T03:17:41.907Z" },
+]
+
+[[package]]
 name = "opentelemetry-api"
 version = "1.45.1"
 source = { registry = "https://pypi.org/simple" }
@@ -632,6 +644,7 @@ dependencies = [
     { name = "httpx" },
     { name = "load-dotenv" },
     { name = "mcstatus" },
+    { name = "minestat" },
     { name = "pydantic" },
     { name = "sqlalchemy" },
     { name = "tqdm" },
@@ -648,6 +661,7 @@ requires-dist = [
     { name = "httpx", specifier = ">=0.28.1" },
     { name = "load-dotenv", specifier = ">=0.1.0" },
     { name = "mcstatus", specifier = ">=14.2.0" },
+    { name = "minestat", specifier = ">=2.7.0" },
     { name = "pydantic", specifier = ">=2.14.1" },
     { name = "sqlalchemy", specifier = ">=2.1.6" },
     { name = "tqdm", specifier = ">=4.70.1" },

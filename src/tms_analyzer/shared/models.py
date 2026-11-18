@@ -14,6 +14,7 @@ class Server(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     ip: Mapped[str] = mapped_column(String(80), unique=True)
     tags: Mapped[str] = mapped_column(String(1200), default="")
+    plugins: Mapped[str] = mapped_column(String(1200), default="")
     url: Mapped[str] = mapped_column(String(1200))
     version: Mapped[str] = mapped_column(String(80))
     enabled: Mapped[bool] = mapped_column(Boolean())
@@ -21,11 +22,6 @@ class Server(Base):
     addedTime: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         default=lambda: datetime.now(timezone.utc),
-    )
-
-    reports: Mapped[list["Report"]] = relationship(
-        back_populates="server",
-        cascade="all, delete-orphan",
     )
 
     def __repr__(self):
