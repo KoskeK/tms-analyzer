@@ -13,8 +13,8 @@ class Server(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     ip: Mapped[str] = mapped_column(String(80), unique=True)
-    tags: Mapped[str] = mapped_column(String(1200), default="", nullable=True)
-    plugins: Mapped[str] = mapped_column(String(1200), default="", nullable=True)
+    tags: Mapped[str] = mapped_column(String(1200), default="", server_default="")
+    plugins: Mapped[str] = mapped_column(String(1200), default="", server_default="")
     url: Mapped[str] = mapped_column(String(1200))
     version: Mapped[str] = mapped_column(String(80))
     enabled: Mapped[bool] = mapped_column(Boolean())
