@@ -93,7 +93,7 @@ def check_server(ip, server_id):
                 server_id=server_id,
                 online=False,
                 player_count=0,
-                status=ms.connection_status
+                status=str(ms.connection_status)
             ), None
 
         return Report(
