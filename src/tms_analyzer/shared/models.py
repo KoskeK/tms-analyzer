@@ -24,6 +24,11 @@ class Server(Base):
         default=lambda: datetime.now(timezone.utc),
     )
 
+    reports: Mapped[list["Report"]] = relationship(
+    back_populates="server",
+    cascade="all, delete-orphan"
+)
+
     def __repr__(self):
         return f"<Server {self.ip}>"
 
