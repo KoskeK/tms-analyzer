@@ -100,7 +100,7 @@ def check_server(ip, server_id):
         return Report(
             server_id=server_id,
             online=True,
-            player_count=status.players.online,
+            player_count=ms.current_players,
             status="Normal"
         ), ms.plugins
 
