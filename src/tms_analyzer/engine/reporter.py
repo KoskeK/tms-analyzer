@@ -88,7 +88,7 @@ def check_server(ip, server_id):
 
         ms = minestat.MineStat(host)
         
-        if not ms.online:
+        if not ms.online or not ms.current_players:
             if error:
                 return Report(
                     server_id=server_id,
